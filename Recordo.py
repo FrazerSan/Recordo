@@ -60,6 +60,16 @@ MOVE_DURATION_MAX = settings.get("move_duration_max", 1.2)
 
 
 # -----------------------------
+#  Stop playback on window close
+# -----------------------------
+def on_close():
+    global playing, recording
+    playing = False
+    recording = False
+    root.destroy()
+
+
+# -----------------------------
 # Recording Logic
 # -----------------------------
 def record_events():
@@ -288,7 +298,7 @@ def toggle_play():
     if not playing:
         playing = True
         play_status_label.config(text="Playing: ON", fg="green")
-        play_thread = threading.Thread(target=play_events)
+        play_thread = threading.Thread(target=play_events, daemon=True)
         play_thread.start()
     else:
         playing = False
@@ -306,6 +316,7 @@ keyboard.add_hotkey("F8", toggle_play)
 # -----------------------------
 root = tk.Tk()
 
+root.protocol("WM_DELETE_WINDOW", on_close) # Ensure we stop threads when closing the window
 
 
 # --- Dark Theme Colors ---
