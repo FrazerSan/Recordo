@@ -21,11 +21,13 @@ settings = {
     "offset_range": 5,
     "timing_jitter": 0,
     "move_duration_min": 0.6,
-    "move_duration_max": 1.2
+    "move_duration_max": 1.2,
+    "curve_intensity": 50
 }
 
 def load_settings():
-    global settings, OFFSET_RANGE, TIMING_JITTER, MOVE_DURATION_MIN, MOVE_DURATION_MAX
+    global settings, OFFSET_RANGE, TIMING_JITTER, MOVE_DURATION_MIN, MOVE_DURATION_MAX, CURVE_INTENSITY
+
     if os.path.exists(SETTINGS_FILE):
         with open(SETTINGS_FILE, "r") as f:
             settings = json.load(f)
@@ -34,6 +36,7 @@ def load_settings():
     TIMING_JITTER = settings.get("timing_jitter", 0)
     MOVE_DURATION_MIN = settings.get("move_duration_min", 0.6)
     MOVE_DURATION_MAX = settings.get("move_duration_max", 1.2)
+    CURVE_INTENSITY = settings.get("curve_intensity", 50)
 
 
 def save_settings():
@@ -149,8 +152,24 @@ def move_mouse_curve(x1, y1, x2, y2, duration=0.6, steps=33):
 
     global playing
 
-    # Larger control point offsets for bigger curves
-    curve_strength = random.randint(80, 140)  # bigger arcs
+   # Distance between points
+    dx = x2 - x1
+    dy = y2 - y1
+    distance = math.hypot(dx, dy)
+
+    # Apply distance-based curve strength
+    if distance < 100:
+        base_strength = random.randint(5, 20)
+    elif distance < 300:
+        base_strength = random.randint(20, 70)
+    else:
+        base_strength = random.randint(70, 150)
+
+    # Apply user intensity (0–100)
+    intensity_scale = CURVE_INTENSITY / 50.0   # 50 = neutral
+    curve_strength = base_strength * intensity_scale
+
+
 
     # Pick a random angle for the curve direction
     angle = random.uniform(0, 3.14)
@@ -533,6 +552,30 @@ def update_duration_max(event=None):
         pass
 
 duration_max_entry.bind("<KeyRelease>", update_duration_max)
+
+
+#--- Curve Intensity ---
+curve_label = tk.Label(advanced_frame, text="Curve Intensity (0-100):", bg=BG, fg=FG)
+curve_label.pack()
+
+curve_entry = tk.Entry(advanced_frame, width=10,
+                       bg=ENTRY_BG, fg=ENTRY_FG,
+                       insertbackground=FG)
+curve_entry.insert(0, str(settings.get("curve_intensity", 50)))
+curve_entry.pack()
+
+def update_curve_intensity(event=None):
+    global CURVE_INTENSITY
+    try:
+        value = int(curve_entry.get())
+        value = max(0, min(100, value))  # clamp 0–100
+        settings["curve_intensity"] = value
+        CURVE_INTENSITY = value
+        save_settings()
+    except ValueError:
+        pass
+
+curve_entry.bind("<KeyRelease>", update_curve_intensity)
 
 
 
