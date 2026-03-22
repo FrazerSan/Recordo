@@ -6,16 +6,26 @@ Recordo uses keybinds to start and stop recording, it takes your click locations
 You can start and stop playing. 
 Save recordings and upload recordings.
 
-It has a always on top toggle.
+Always on top toggle
 
-Advanced settings let you controls that expand and contract to keep the window small.
+Advanced settings contains two tabs, movement and clicks.
+
+Movement
+
+Curve intensity, default is 50, 0 will set straight lines, 100 doubles the default. Curves are set so that small movements will have less curve. 
+
+Movement tiers
+
+These control the speed of mouse movement before the click event, short clicks can happen quickly and long distance clicks will move slower. 
+
+<img width="262" height="709" alt="image" src="https://github.com/user-attachments/assets/b497a731-f518-4005-9172-40a53e2bff96" />
+
+
+Clicks
 
 Offset range, controls how much variety is allowed in the area of the click. 
 
 Timing jitter, adds random time delays between clicks instead of the exact recorded click.
 
-Moveduration Min and Max, Controls how quickly the mouse moves to the click location.
+<img width="255" height="712" alt="image" src="https://github.com/user-attachments/assets/a98d755a-dcd7-45f5-b2e1-87b549e0a073" />
 
-Curve intensity, default is 50, 0 will set straight lines, 100 doubles the default. Curves are set so that small movements will have less curve. 
-
-<img width="270" height="552" alt="image" src="https://github.com/user-attachments/assets/7a1dbf6e-51fa-4dc6-a2a0-d57b7d25a58b" />
