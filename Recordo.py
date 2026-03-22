@@ -224,44 +224,67 @@ def play_events():
                 break
 
             etype, timestamp, data = event
-            now = time.time() - start_time
 
-            # Calculate delay until this event should fire
-            delay = timestamp - now
+            # -----------------------------
+            # KEYBOARD EVENTS
+            # -----------------------------
+            if etype == "key":
+                now = time.time() - start_time
+                delay = timestamp - now
 
-            # Apply timing jitter (± TIMING_JITTER ms)
-            if TIMING_JITTER > 0:
-                jitter = random.uniform(-TIMING_JITTER/1000, TIMING_JITTER/1000)
-                delay += jitter
+                if TIMING_JITTER > 0:
+                    jitter = random.uniform(-TIMING_JITTER/1000, TIMING_JITTER/1000)
+                    delay += jitter
 
-            # Only sleep if delay is positive
-            if delay > 0:
-                time.sleep(delay)
+                if delay > 0:
+                    time.sleep(delay)
 
+                keyboard.press_and_release(data)
+                continue
+
+            # -----------------------------
+            # MOUSE CLICKS (movement scheduled to land on time)
+            # -----------------------------
             if etype in ("click_left", "click_right"):
                 x, y = data
 
+                # Apply offset
                 offset_x = random.randint(-OFFSET_RANGE, OFFSET_RANGE)
                 offset_y = random.randint(-OFFSET_RANGE, OFFSET_RANGE)
-
                 target_x = x + offset_x
                 target_y = y + offset_y
 
-                current_x, current_y = pyautogui.position()
+                # Base scheduled click time
+                scheduled_time = timestamp
+
+                # Apply jitter to click time
+                if TIMING_JITTER > 0:
+                    scheduled_time += random.uniform(-TIMING_JITTER/1000, TIMING_JITTER/1000)
+
+                # Random movement duration
                 duration = random.uniform(MOVE_DURATION_MIN, MOVE_DURATION_MAX)
 
+                # When movement must begin
+                movement_start_time = scheduled_time - duration
+
+                # Wait until movement start time
+                now = time.time() - start_time
+                delay = movement_start_time - now
+                if delay > 0:
+                    time.sleep(delay)
+
+                # Move
+                current_x, current_y = pyautogui.position()
                 move_mouse_curve(current_x, current_y, target_x, target_y, duration=duration)
 
                 if not playing:
                     return
 
+                # Click immediately on arrival
                 if etype == "click_left":
                     pyautogui.click()
                 else:
                     pyautogui.rightClick()
-
-            elif etype == "key":
-                keyboard.press_and_release(data)
 
 # -----------------------------
 # Save / Load
