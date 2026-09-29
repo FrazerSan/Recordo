@@ -1,0 +1,1 @@
+{"offset_range": 5, "timing_jitter": 0, "tier1_distance": 350, "tier2_distance": 700, "tier1_min": 0.1, "tier1_max": 0.25, "tier2_min": 0.25, "tier2_max": 0.55, "tier3_min": 0.55, "tier3_max": 1.2, "curve_intensity": 50}
